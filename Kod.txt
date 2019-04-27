@@ -1,0 +1,362 @@
+
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Queue;
+import java.util.Random;
+
+    //Oluþturduðumuz listelerde veri tutmak için kullanýyoruz.
+    class Node
+    {
+	//x ve y koordinatlarý temsil eder
+	//dist mümkün olan en kýsa yolu elinde tutar.
+	int x, y,x2,y2,dist;
+
+	Node(int x, int y, int dist) {
+		this.x = x;
+		this.y = y;
+		this.dist = dist;
+	}
+        //Burada x ve y deðiþkenlerini engel ile karþýlaþmadan önceki konumumuzu
+        //tutuyoruz x2 ve y2 deðiþkenlerinide çarptýðýmýz engelin konumu tutmak için
+        //kullanýyoruz x ve y biz daha sonra path2 içindeki veriler ile path3 
+        //karþýlaþtýrýrken lazým olucak bu sayede en kýsa yolda ilerken çarptýðýmýz
+        //engelleri bulmuþ olucaðýz.
+        Node(int x, int y, int x2,int y2) {
+		this.x = x;
+		this.y = y;
+		this.x2=x2;
+                this.y2=y2;
+	}
+    };
+
+public class Oyun {
+        //Linkteki kod parçacýðý üzerinde eklemeler yapýlarak sonuca ulaþýlmýþtýr.
+        //https://www.techiedelight.com/lee-algorithm-shortest-path-in-a-maze/
+    
+        //Baþlangýç noktasýndan hedefe ulaþana kadar olan adým sayýsýný tutmak için kullanýyoruz.
+        int dist,min_dist2;
+        static int yaz=0;
+        //En az bir engele uðramak için kullanýyoruz.
+        //Uzaklýðýn dokuz olmasýnýn sebebi en uzak noktaya olan uzaklýðý yaklaþýk olarak dokuz olmasýdýr.
+        static int e_x=6,e_y=7,uzaklik=14;
+        
+        //Ýlk path deðiþkenimiz tüm adýmlarýmýzý depolar.
+         ArrayList<Node>path= new ArrayList<Node>();
+        //Ýkinci path deðiþkenimiz en kýsa yolu depolar.
+        static List<Integer>path2= new ArrayList<Integer>();
+         //Üçüncü path deðiþkenimiz tüm karþýlaþtýðýmýz engelleri depolar.
+        static ArrayList<Node>path3= new ArrayList<Node>();
+         //sayac deðiþkeni bize attýðýmýz adým tüm adýmlarýn sayýsýný verir.
+         //Daha sonra tüm adýmlarýn içinden kýsa yolu çekerken kullanýrýz.
+        static int sayac=0;
+	// M x N matrix
+	private static final int M = 8;
+	private static final int N = 8;
+
+	//Olabilecek dört haraket bu arraylerin içindeki deðerlerle saðlanýr.
+        //Bu arrayler sayesinde çapraz ilerleme engellenmiþ olur
+	private  final int row[] = { -1, 0, 0, 1 };
+	private  final int col[] = { 0, -1, 1, 0 };
+
+        //Gidilmek istenen konumun geçerliliðini kontrol ediyor.
+        //Ayný zamanda daha önce ziyaret edilip edilmediðine bakar
+        //Bu sayede ayný yerde dönüp durmaz
+	private  boolean isValid(int mat[][], boolean visited[][],int row, int col)
+	{
+		return (row >= 0) && (row < M) && (col >= 0) && (col < N)&& mat[row][col] == 1 && !visited[row][col];
+	}
+
+	// Hedef hücreye en kýsa yolu bulur
+	// Baþlangýç (i, j) hedef (x, y)
+        public int BFS(int mat[][], int i, int j, int x, int y)
+	{        
+		//Ziyaret edilen hücreleri iþaretlemek için bir matris oluþturuyoruz.
+		boolean[][] visited = new boolean[M][N];
+                int min_dist = Integer.MAX_VALUE;
+	
+		Queue<Node> q = new ArrayDeque<>();
+                Node node;
+		//Baþlangýç noktasýný iþaretliyoruz.Bu sayede tekrar buraya dönmemiz engelleniyor.
+		visited[i][j] = true;
+		q.add(new Node(i, j, 0));
+                path.add(new Node(i, j,0));
+		
+		
+
+		//Queue boþ olana kadar dönememizi saðlar.
+		while (!q.isEmpty())
+		{   
+                    /*if(path2.size()!=0){
+                     path2.remove(path2.size());
+                    path2.r*emove(path2.size()-1);
+                    }*/
+			//Veri çýkartýlýr
+			node = q.poll();
+
+			//i ve j deðikenlerinde bulunduðumuz konu tutuyoruz.
+                        //bu deðiþkenleri hedefe ulaþýp ulaþmadýðýmýz kontrol etmek için kullanýyoruz.
+			i = node.x;
+			j = node.y;
+                        //Hedefe ulaþana kadar dist deðerni güncel tutuyoruz.
+			dist = node.dist;
+
+			//Sonuca ulaþýldýysa while döngüsü kýrýlýr.
+			if (i == x && j == y)
+			{
+                            path.add(new Node(i,j, dist+1));
+				min_dist = dist;
+				break;
+			}
+
+			//Olasý haraket kontrol edilir.
+			//Kontrol edilen haraketlerden geçerli olanlar eklenir
+			for (int k = 0; k < 4; k++)
+			{
+				//Atýcaðýmýz adýmýn uygunluðunu kontrol ediyoruz
+				if (isValid(mat, visited, i + row[k], j + col[k]))
+				{
+					//Ziyaret edilen hücre olarak iþaretlenir
+					visited[i + row[k]][j + col[k]] = true;
+                                        path.add(new Node(i + row[k], j + col[k], dist + 1));
+                                        sayac++;
+                                       //System.out.println("x:"+(i + row[k])+" y:"+(j + col[k]));
+					q.add(new Node(i + row[k], j + col[k], dist + 1));
+				}
+                                else if((i + row[k])>=0&&(j + col[k])>=0&&(j + col[k])<8&&(i + row[k])<8&&!visited[i + row[k]][j + col[k]]){
+                                    path3.add(new Node(i ,j ,i + row[k], j + col[k]));
+                                   
+                                }
+			}
+                        
+		}
+                min_dist2=min_dist;
+		if (min_dist != Integer.MAX_VALUE) { 
+                    if(yaz==0){
+                        System.out.println("x:"+x+" y:"+y+"");
+                        yaz++;
+                    }
+                   //Bu tüm adýmlarýn içinden en kýsa yolu çekiyoruz.Bu kýsýmda
+                   //kullandýðým mantýk tüm adýmlarý tersten incelemek oldu.
+                   //Bunun sebebi kulladýðým kod parçacýðý hedefe gidene kadar
+                   //tüm mümkün yollarý denemesi ile hedefe ulaþmasýdýr
+                   //Üst kýsýmda bulunan kod parçacýklarý hedef konuma vardýðý 
+                   //noktadan itibaren tüm verileri tersten inceleyerek bir önceki
+                   //adýmý buluyoruz.
+                   for(int k=sayac;k>=0;k--){
+                       
+                    if((min_dist-path.get(k).dist)==1){
+                       
+                        int sonuc = (Math.abs(x-(path.get(k).x)))+Math.abs((y-(path.get(k).y)));
+                        if(sonuc==1){
+                         //x ve y deðiþkenleri geri giderken güncelliyoruz.
+                         x=path.get(k).x;
+                         y=path.get(k).y;
+                         //Uygun deðerkeri path ikiye ekliyoruz.
+                         path2.add(path.get(k).x);
+                         path2.add(path.get(k).y);
+                         
+                         System.out.println("x:"+x+" y:"+y);
+                         //min_dist deðiþkeni azaltýlarak uygun deðerlerle karýþaþtýrlmasýnýný saðlýyoruz.
+                         min_dist--;
+                         
+                        }
+                    }
+                   }    
+                   return min_dist2;
+                }
+		else {
+                    System.out.print("Sonuca ulaþýlamadý");
+                    path2.clear();
+                    path3.clear();
+                    sayac=0;
+                    yaz=0;
+                    return 99;
+		}
+                 
+                
+    
+    
+        }
+       public void engelleri_bas(){
+           System.out.println("");
+             //Yolda karþýlaþtýðýmýz engelleri depolarken hangi konumdayken karþýlatýðýmýzýn
+                   //bilgisini elimizde tutuðumuz için bunu en kýsa yoldaki koordinatlarý karþýlaþtýrarak
+                   //çarptýðýmýz siyah pullarý ekrana basabiliriz.
+                   if(path3.size()!=0){
+                    System.out.println("Ayný koordinat tekrar ediyorsa tekrar oraya gidilmeye çalýþýlmýþtýr");
+                    System.out.println("Karþýlaþýlan Engeller:");
+                    for(int t=0;t<path2.size();t+=2){
+                        
+                        for(int c=0;c<(path3.size());c++){
+                         if(path3.get(c).x==path2.get(t)&&path3.get(c).y==path2.get(t+1)){
+                            System.out.println("x:"+path3.get(c).x2+" y:"+path3.get(c).y2);
+                         }
+                        }
+                     }
+                   }
+                   
+       }
+    //Tahtayý ekrana çiziyoruz.
+    public void Tahta_ciz(int[][] mat){
+        
+        for(int i=0;i<8;i++){
+            for(int j=0;j<8;j++){
+                System.out.print(mat[i][j]+"  ");
+            }
+            System.out.println("");
+        }
+    }
+    //Engelleri atýyoruz.
+    public int[][] Engel_ekle(int[][] mat){
+        
+        Random rdm = new Random();
+        int engel_sayisi,x,y;
+        
+        engel_sayisi=(rdm.nextInt(8)+1);
+       // System.out.println("Engel_sayisi:"+engel_sayisi);
+        for(int i=0;i<engel_sayisi;i++){
+            x=rdm.nextInt(8);
+            y=rdm.nextInt(8);
+            //Baþlangýç noktasýnýn ve bitiþ noktasýnýn eriþilmez olmasýný
+            //engellemek için kullanýyoruz.
+            if(!(x==0&&y==0)&&!(x==7&&y==7)){
+                //Sýfýr atanan nokta haraket edilemicek olan hücredir.
+                mat[x][y]=0;
+            }
+            
+        }
+        mat=yol_ac(mat);
+        mesafe_bul(mat);
+        mat=engel_kaldý_mi(mat);
+            
+        return mat;
+    }
+    public int[][] yenile(int[][] mat){
+        for(int i=0;i<8;i++){
+            for(int j=0;j<8;j++){
+                mat[i][j]=1;
+            }
+        }
+        return mat;
+    }
+    public int[][] yol_ac(int[][] mat){
+        if(mat[0][1]==0&&mat[0][1]==0)
+            mat[0][1]=1;
+        if(mat[6][7]==0&&mat[7][6]==0)
+            mat[7][6]=1;
+        
+        return mat;
+    }
+    public void mesafe_bul(int[][] mat){
+        for(int x=0;x<8;x++){
+            for(int y=0;y<8;y++){
+            if(mat[x][y]==0){
+                int mesafe=x+y;
+                if(mesafe < uzaklik){
+                    uzaklik=mesafe;
+                    e_x=x;
+                    e_y=y;
+                }
+            }
+            }
+        }
+    }
+    public int[][] engel_kaldý_mi(int[][] mat){
+        int k=0;
+        for(int i=0;i<8;i++){
+            for(int j=0;j<8;j++){
+                if(mat[i][j]==0){
+                    k=1;
+                }
+            }
+        }
+        if(k==0){
+           uzaklik=14;
+           mat=yenile(mat);
+           mat= Engel_ekle(mat);
+           mat=engel_kaldý_mi(mat);
+        }
+        
+        return mat;
+    }
+}
+
+
+import java.util.Arrays;
+
+public class Main {
+    
+    //Eðer ulaþýlmazsa adýmlardan return 99  döndürmesi sebebiyle 99 eþit olucak
+    //Bu da hedefe varamadýðýmýz anlamýna gelicek.
+    public static final int HEDEFE_ULASILAMADI_KODU = 99;
+    
+      public static void main(String[] args) {
+        //Bir olan hücrelere haraket edilebileceðini gösteriyor
+        //Daha sonra engel olan kýsýmlar sýfýr yapýlýr.
+        int[][] oyun_tahtasi =
+		{
+			{ 1, 1, 1, 1, 1, 1, 1, 1},
+			{ 1, 1, 1, 1, 1, 1, 1, 1},
+			{ 1, 1, 1, 1, 1, 1, 1, 1},
+			{ 1, 1, 1, 1, 1, 1, 1, 1},
+			{ 1, 1, 1, 1, 1, 1, 1, 1},
+			{ 1, 1, 1, 1, 1, 1, 1, 1},
+			{ 1, 1, 1, 1, 1, 1, 1, 1},
+			{ 1, 1, 1, 1, 1, 1, 1, 1},
+
+		};
+        
+        int min_adým=0,k=0;
+        int min_adým2=0;
+        Oyun oyun= new Oyun();
+        
+        //Projenin isterlerinden biri olan engelle karýlaþmanýn gerçekleþmesi içim
+        //Beyaz bul öncelikle en yakýn engelin yanýna uðrar.Ýkinci adýmda hedef
+        //konuma doðru ilerlemeye baþlar.
+        
+        while(k==0){
+            
+       
+
+            oyun_tahtasi=oyun.Engel_ekle(oyun_tahtasi);
+        
+            //Bu kýsmý kullanmamýzýn sebebi eðer engelin üstünü hedeflersek kulladýðým
+            //algoritma buraya ulaþamiyacak.Bu yüzden bir önceki adýma gelirsem
+            //o kýsýmda 4 hareketide denerken engele çarpýcaðým için mutlaka bir
+            //engelle ile karþýlaþmýþ olacaðým.
+            if(oyun.e_x!=0&&oyun.uzaklik>0) oyun.e_x-=1;
+            else if(oyun.e_y!=0){oyun.e_y-=1;}
+        
+            //Projenin isterlerinden biri olan engelle karýlaþmanýn gerçekleþmesi içim
+            //Beyaz bul öncelikle en yakýn engelin yanýna uðrar.Ýkinci adýmda hedef
+            //konuma doðru ilerlemeye baþlar.
+            System.out.println("En kýsa yolun koordinatlarý:");
+            min_adým=oyun.BFS(oyun_tahtasi, oyun.e_x, oyun.e_y, 7, 7);
+            min_adým2=oyun.BFS(oyun_tahtasi, 0, 0, oyun.e_x, oyun.e_y);
+        
+        
+            //Eðer ikiside 99 eþit deðilse hedefe ulaþýlmýþtýr.
+            if(min_adým!=HEDEFE_ULASILAMADI_KODU&&min_adým2!=HEDEFE_ULASILAMADI_KODU){
+                oyun.engelleri_bas();
+                System.out.println("\nMümkün olan en kýsa yol "+(min_adým+min_adým2)+"adým\n");        
+                k=1;
+            }
+            
+            System.out.println("Engel eklenmiþ oyun tahtasý:");
+            oyun.Tahta_ciz(oyun_tahtasi);
+            //Eðer ulaþmadýysak tahtadaki sýfýrlarýn temizlenmesi gerekiyor mu fonksiyonda
+            //tahtayý tekrar baþlangýçtaki haline getirmemizi saðlýyor.
+            oyun_tahtasi=oyun.yenile(oyun_tahtasi);
+        }
+
+        
+        
+        
+        
+    
+        
+    }
+    
+    
+}

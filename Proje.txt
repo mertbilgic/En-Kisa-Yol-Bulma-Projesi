@@ -1,0 +1,23 @@
+Java programlama dilini kullanarak  satranç tahtasý üzerinde oynanan basit bir oyun yazmaný bekliyoruz, kurgulanmasýný istediðimiz oyunun detaylarýna aþaðýdaki maddelerde bulabilirsiniz.
+
+- Oyun beyaz bir pulun oyun tahtasý üzerinde bir uçtan ( A1 ) diðer uça ( H8 ) gitmesini amaçlamaktadýr. 
+
+- Oyun baþlangýcýnda oyun tahtasý üzerine; 
+	- A1 konumuna beyaz pul yerleþtirilmelidir. 
+	- Oyunun kurallarýný bozmayacak þekilde random olarak 0 ile 9 adet arasýnda siyah pullar yerleþtirilmelidir. 
+        - Oyun her zaman bite bilmelidir. 
+
+- Hareket eden beyaz pullar
+	- Çapraz ilerleyemez.
+	- Siyah pullarý yiyemez.
+	- Siyah pullarýn üzerinden geçemez.
+
+- A1 noktasýndan harekete baþlamasý gereken beyaz pul H8 konumuna geldiðinde oyun tamamlanmýþtýr. 
+        - Beyaz pul H8 konumunda ilerlerken; 
+                - En az bir siyah pul ile karþýlaþmalýdýr. 
+                - H8 konumuna gidilirken 
+			- Karþýlaþýlan siyah pullarýn konumlarý oyun sonunda konsol üzerinde belirtilmelidir.
+			- Mümkün olan en kýsa yol takip edilerek oyun tamamlanmalýdýr.  
+        	- Beyaz pulun takip ettiði adýmlar oyun sonunda konsol üzerinde belirtilmelidir.
+
+Uygulamanýzý geliþtirirken JavaSE konsol uygulamasý olarak gerçekleþtirebilirsiniz, yaptýðýnýz geliþtirmede aþaðýdaki konu baþlýklarýna dikkat ederek özen göstermenizi rica ederiz. 
